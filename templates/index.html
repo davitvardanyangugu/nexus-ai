@@ -1,144 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>NEXUS</title>
-
-<style>
-body{
-    margin:0;
-    background:#0d1117;
-    color:white;
-    font-family:Arial;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-}
-
-header{
-    background:#161b22;
-    padding:18px;
-    text-align:center;
-    font-size:24px;
-    font-weight:bold;
-}
-
-#chat{
-    flex:1;
-    overflow-y:auto;
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-}
-
-.msg{
-    max-width:70%;
-    padding:12px;
-    margin:8px;
-    border-radius:14px;
-    white-space:pre-wrap;
-}
-
-.user{ background:#238636; align-self:flex-end; }
-.bot{ background:#21262d; align-self:flex-start; }
-
-#bottom{
-    display:flex;
-    padding:12px;
-    background:#161b22;
-}
-
-#userInput{
-    flex:1;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#21262d;
-    color:white;
-}
-
-button{
-    margin-left:10px;
-    padding:12px 14px;
-    border:none;
-    border-radius:10px;
-    background:#238636;
-    color:white;
-    cursor:pointer;
-}
-button:hover{ background:#2ea043; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0b10">
+  <title>Alenaz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
 <body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <button class="brand" id="brandButton" aria-label="Alenaz home">
+          <span class="brand-mark">A</span>
+          <span>Alenaz</span>
+        </button>
+        <button class="icon-button mobile-only" id="closeSidebar" aria-label="Close sidebar">×</button>
+      </div>
 
-<header>NEXUS</header>
+      <button class="new-chat" id="newChatButton">
+        <span>＋</span>
+        <span>New chat</span>
+      </button>
 
-<div id="chat"></div>
+      <div class="sidebar-section">
+        <div class="section-label">Tools</div>
+        <button class="sidebar-action" id="sidebarSearch">
+          <span>⌕</span><span>Search the web</span>
+        </button>
+        <button class="sidebar-action" id="sidebarImage">
+          <span>✦</span><span>Create an image</span>
+        </button>
+      </div>
 
-<div id="bottom">
-    <input id="userInput" placeholder="Speak or type...">
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="startVoice()">🎤</button>
-</div>
+      <div class="sidebar-section grow">
+        <div class="section-label">Recent</div>
+        <div class="history-list" id="historyList"></div>
+      </div>
 
-<script>
-const chat = document.getElementById("chat");
+      <div class="sidebar-footer">
+        <div class="usage-pill" id="usagePill">Prototype</div>
+        <button class="profile-button" id="settingsButton">
+          <span class="avatar" id="avatarLetter">G</span>
+          <span class="profile-copy">
+            <strong id="profileName">Guest</strong>
+            <small>Settings</small>
+          </span>
+          <span class="chevron">›</span>
+        </button>
+      </div>
+    </aside>
 
-function addMessage(text, cls){
-    const div = document.createElement("div");
-    div.className = "msg " + cls;
-    div.innerText = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="openSidebar" aria-label="Open sidebar">☰</button>
+        <button class="model-pill" id="modelPill">
+          <span class="status-dot"></span>
+          <span id="modelLabel">Alenaz</span>
+          <small id="modelName">loading…</small>
+        </button>
+        <div class="topbar-actions">
+          <button class="topbar-button" id="searchToggle" aria-pressed="false">⌕ Search</button>
+          <button class="icon-button" id="themeButton" aria-label="Toggle theme">☼</button>
+        </div>
+      </header>
 
-async function sendMessage(){
-    const input = document.getElementById("userInput");
-    const text = input.value;
+      <div class="notice hidden" id="apiNotice"></div>
 
-    if(!text.trim()) return;
+      <section class="conversation">
+        <div class="welcome" id="welcome">
+          <div class="hero-orb">
+            <div class="hero-letter">A</div>
+          </div>
+          <p class="eyebrow">MEET ALENAZ</p>
+          <h1>What can I help you create?</h1>
+          <p class="welcome-copy">Chat, search the web, understand images and files, or turn an idea into a picture.</p>
 
-    addMessage(text, "user");
-    input.value = "";
+          <div class="starter-grid">
+            <button class="starter-card" data-prompt="Teach me something difficult in a simple way">
+              <span class="starter-icon">◎</span>
+              <span><strong>Learn</strong><small>Explain anything step by step</small></span>
+            </button>
+            <button class="starter-card" data-tool="search">
+              <span class="starter-icon">⌕</span>
+              <span><strong>Search</strong><small>Find current information online</small></span>
+            </button>
+            <button class="starter-card" data-tool="image">
+              <span class="starter-icon">✦</span>
+              <span><strong>Create image</strong><small>Turn a prompt into artwork</small></span>
+            </button>
+            <button class="starter-card" data-prompt="Help me build a cool app from scratch">
+              <span class="starter-icon">⌘</span>
+              <span><strong>Build</strong><small>Code, debug and brainstorm</small></span>
+            </button>
+          </div>
+        </div>
 
-    const res = await fetch("/ask?q=" + encodeURIComponent(text));
-    const data = await res.json();
+        <div class="messages" id="messages"></div>
+      </section>
 
-    addMessage(data.answer, "bot");
+      <div class="composer-wrap">
+        <div class="mode-banner hidden" id="modeBanner">
+          <span id="modeBannerIcon">⌕</span>
+          <span id="modeBannerText">Web search enabled</span>
+          <button id="clearMode" aria-label="Clear mode">×</button>
+        </div>
 
-    speak(data.answer);
-}
+        <div class="attachment-preview hidden" id="attachmentPreview">
+          <div class="attachment-thumb" id="attachmentThumb">FILE</div>
+          <div class="attachment-meta">
+            <strong id="attachmentName"></strong>
+            <small id="attachmentType"></small>
+          </div>
+          <button class="icon-button small" id="removeAttachment" aria-label="Remove attachment">×</button>
+        </div>
 
-function speak(text){
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "en-US";
-    utter.rate = 1;
-    window.speechSynthesis.speak(utter);
-}
+        <div class="composer">
+          <button class="composer-icon" id="attachButton" aria-label="Attach a file">＋</button>
+          <input type="file" id="fileInput" hidden accept="image/*,.pdf,.txt,.md,.csv,.json,.doc,.docx,.ppt,.pptx">
 
-function startVoice(){
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+          <textarea id="promptInput" rows="1" placeholder="Message Alenaz"></textarea>
 
-    if(!SpeechRecognition){
-        alert("Voice not supported in this browser");
-        return;
-    }
+          <div class="composer-actions">
+            <select id="modeSelect" aria-label="Alenaz mode">
+              <option value="auto">Auto</option>
+              <option value="study">Study</option>
+              <option value="creative">Creative</option>
+              <option value="code">Code</option>
+            </select>
+            <button class="composer-icon" id="voiceButton" aria-label="Voice input">◉</button>
+            <button class="send-button" id="sendButton" aria-label="Send message">↑</button>
+          </div>
+        </div>
+        <p class="disclaimer">Alenaz can make mistakes. Check important information.</p>
+      </div>
+    </main>
+  </div>
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.start();
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">ALENAZ</p>
+          <h2>Settings</h2>
+        </div>
+        <button class="icon-button" id="closeSettings">×</button>
+      </div>
 
-    recognition.onresult = function(event){
-        const text = event.results[0][0].transcript;
-        document.getElementById("userInput").value = text;
-        sendMessage();
-    };
-}
+      <label class="setting-field">
+        <span>Your display name</span>
+        <input id="displayNameInput" maxlength="30" placeholder="Guest">
+      </label>
 
-addMessage("NEXUS voice system online.", "bot");
-</script>
+      <label class="setting-row">
+        <span><strong>Read answers aloud</strong><small>Uses your browser's text-to-speech voice.</small></span>
+        <input type="checkbox" id="speakToggle">
+      </label>
 
+      <label class="setting-row">
+        <span><strong>Compact messages</strong><small>Uses a tighter conversation layout.</small></span>
+        <input type="checkbox" id="compactToggle">
+      </label>
+
+      <div class="danger-zone">
+        <button class="secondary-button" id="clearHistoryButton">Clear chat history</button>
+      </div>
+
+      <button class="primary-button" id="saveSettings">Save settings</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
